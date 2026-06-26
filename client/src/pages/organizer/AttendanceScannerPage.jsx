@@ -19,7 +19,15 @@ export default function AttendanceScannerPage() {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const scannerInstanceRef = useRef(null);
-  const processingRef = useRef(false); // ref so the scan loop can read latest value
+  const processingRef = useRef(false);
+  // Use a ref for scanState so the animation loop always sees the latest value
+  const scanStateRef = useRef('idle');
+
+  // Keep scanStateRef in sync with scanState
+  const updateScanState = (state) => {
+    scanStateRef.current = state;
+    setScanState(state);
+  };
 
   useEffect(() => {
     api.get(`/events/${eventId}`).then(({ data }) => setEvent(data.event)).catch(() => { });
@@ -56,7 +64,7 @@ export default function AttendanceScannerPage() {
 
   // ── Camera access using native getUserMedia + html5-qrcode decoder ──────────
   const startCamera = useCallback(async () => {
-    setScanState('requesting');
+    updateScanState('requesting');
     setCameraError('');
 
     // 1. Check if browser supports getUserMedia
@@ -65,7 +73,7 @@ export default function AttendanceScannerPage() {
         ? 'Camera requires HTTPS. The app must be served over HTTPS for camera access.'
         : 'Your browser does not support camera access.';
       setCameraError(msg);
-      setScanState('error');
+      updateScanState('error');
       return;
     }
 
@@ -95,7 +103,7 @@ export default function AttendanceScannerPage() {
         } catch {
           msg = 'Could not start camera. Try flipping the camera or refreshing.';
           setCameraError(msg);
-          setScanState('error');
+          updateScanState('error');
           return;
         }
       } else {
@@ -103,34 +111,78 @@ export default function AttendanceScannerPage() {
       }
       if (!stream) {
         setCameraError(msg);
-        setScanState('error');
+        updateScanState('error');
         return;
       }
     }
 
-    // 3. Attach stream to video element
+    // 3. Store stream reference first
     streamRef.current = stream;
-    if (videoRef.current) {
-      videoRef.current.srcObject = stream;
-      await videoRef.current.play().catch(() => { });
-    }
 
-    setScanState('scanning');
+    // 4. Set scanning state so the video element becomes visible in the DOM
+    updateScanState('scanning');
 
-    // 4. Start QR decoding loop using html5-qrcode's Html5Qrcode engine
+    // 5. Attach stream to video element - wait for DOM to update
+    //    Use a small delay + retry mechanism to ensure videoRef.current is set
+    const attachStream = () => {
+      return new Promise((resolve) => {
+        const tryAttach = (attempts = 0) => {
+          if (videoRef.current) {
+            const video = videoRef.current;
+            video.srcObject = stream;
+            video.setAttribute('playsinline', '');
+            video.setAttribute('muted', '');
+            video.muted = true;
+
+            video.onloadedmetadata = () => {
+              video.play()
+                .then(resolve)
+                .catch((playErr) => {
+                  console.warn('Video play error:', playErr);
+                  resolve(); // Continue even if autoplay fails
+                });
+            };
+
+            // Also try playing immediately in case metadata is already loaded
+            if (video.readyState >= 1) {
+              video.play()
+                .then(resolve)
+                .catch(() => resolve());
+            }
+          } else if (attempts < 20) {
+            // Retry up to 20 times (200ms total) waiting for DOM
+            setTimeout(() => tryAttach(attempts + 1), 10);
+          } else {
+            resolve(); // Give up waiting, continue anyway
+          }
+        };
+        tryAttach();
+      });
+    };
+
+    await attachStream();
+
+    // 6. Start QR decoding loop using html5-qrcode's Html5Qrcode engine
     try {
       const { Html5Qrcode } = await import('html5-qrcode');
       const decoder = new Html5Qrcode('__qr_decode_hidden__', { verbose: false });
       scannerInstanceRef.current = decoder;
 
       const tick = async () => {
-        if (!videoRef.current || scanState === 'idle') return;
-        if (videoRef.current.readyState < 2) {
+        // Use the ref (not closure) so we always check the current state
+        if (!streamRef.current || scanStateRef.current !== 'scanning') return;
+        if (!videoRef.current) {
           requestAnimationFrame(tick);
           return;
         }
-        // Capture a frame from video into an offscreen canvas
+
         const video = videoRef.current;
+        if (video.readyState < 2 || video.videoWidth === 0) {
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        // Capture a frame from video into an offscreen canvas
         const offscreen = document.createElement('canvas');
         offscreen.width = video.videoWidth || 640;
         offscreen.height = video.videoHeight || 480;
@@ -150,7 +202,9 @@ export default function AttendanceScannerPage() {
           // No QR found in this frame — normal, keep looping
         }
 
-        if (streamRef.current) requestAnimationFrame(tick);
+        if (streamRef.current && scanStateRef.current === 'scanning') {
+          requestAnimationFrame(tick);
+        }
       };
 
       requestAnimationFrame(tick);
@@ -167,14 +221,18 @@ export default function AttendanceScannerPage() {
     if (scannerInstanceRef.current) {
       scannerInstanceRef.current = null;
     }
-    if (videoRef.current) videoRef.current.srcObject = null;
-    setScanState('idle');
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    updateScanState('idle');
   };
 
   const flipCamera = async () => {
     stopCamera();
-    setFacingMode(prev => prev === 'environment' ? 'user' : 'environment');
-    setTimeout(() => startCamera(), 300);
+    const newMode = facingMode === 'environment' ? 'user' : 'environment';
+    setFacingMode(newMode);
+    // Wait for facingMode state update and camera stop before restarting
+    setTimeout(() => startCamera(), 400);
   };
 
   const handleManualSubmit = (e) => {
@@ -269,60 +327,59 @@ export default function AttendanceScannerPage() {
               </div>
             )}
 
-            {/* SCANNING */}
-            {scanState === 'scanning' && (
-              <div>
-                {/* Live video preview */}
-                <div style={{ position: 'relative', borderRadius: '0.75rem', overflow: 'hidden', background: '#000', aspectRatio: '4/3' }}>
-                  <video
-                    ref={videoRef}
-                    playsInline
-                    muted
-                    autoPlay
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  />
-                  {/* Scan overlay */}
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-                    <div style={{ width: 200, height: 200, position: 'relative' }}>
-                      {/* Corner brackets */}
-                      {[
-                        { top: 0, left: 0, borderTop: '3px solid #7c3aed', borderLeft: '3px solid #7c3aed', borderRadius: '4px 0 0 0' },
-                        { top: 0, right: 0, borderTop: '3px solid #7c3aed', borderRight: '3px solid #7c3aed', borderRadius: '0 4px 0 0' },
-                        { bottom: 0, left: 0, borderBottom: '3px solid #7c3aed', borderLeft: '3px solid #7c3aed', borderRadius: '0 0 0 4px' },
-                        { bottom: 0, right: 0, borderBottom: '3px solid #7c3aed', borderRight: '3px solid #7c3aed', borderRadius: '0 0 4px 0' },
-                      ].map((s, i) => (
-                        <div key={i} style={{ position: 'absolute', width: 28, height: 28, ...s }} />
-                      ))}
-                      {/* Scanning line */}
-                      <motion.div
-                        animate={{ top: ['10%', '90%', '10%'] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                        style={{ position: 'absolute', left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #7c3aed, transparent)' }}
-                      />
-                    </div>
+            {/* SCANNING — video element is always rendered so ref is always valid,
+                but only shown/styled when scanning */}
+            <div style={{ display: scanState === 'scanning' ? 'block' : 'none' }}>
+              {/* Live video preview */}
+              <div style={{ position: 'relative', borderRadius: '0.75rem', overflow: 'hidden', background: '#000', aspectRatio: '4/3' }}>
+                <video
+                  ref={videoRef}
+                  playsInline
+                  muted
+                  autoPlay
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+                {/* Scan overlay */}
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+                  <div style={{ width: 200, height: 200, position: 'relative' }}>
+                    {/* Corner brackets */}
+                    {[
+                      { top: 0, left: 0, borderTop: '3px solid #7c3aed', borderLeft: '3px solid #7c3aed', borderRadius: '4px 0 0 0' },
+                      { top: 0, right: 0, borderTop: '3px solid #7c3aed', borderRight: '3px solid #7c3aed', borderRadius: '0 4px 0 0' },
+                      { bottom: 0, left: 0, borderBottom: '3px solid #7c3aed', borderLeft: '3px solid #7c3aed', borderRadius: '0 0 0 4px' },
+                      { bottom: 0, right: 0, borderBottom: '3px solid #7c3aed', borderRight: '3px solid #7c3aed', borderRadius: '0 0 4px 0' },
+                    ].map((s, i) => (
+                      <div key={i} style={{ position: 'absolute', width: 28, height: 28, ...s }} />
+                    ))}
+                    {/* Scanning line */}
+                    <motion.div
+                      animate={{ top: ['10%', '90%', '10%'] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                      style={{ position: 'absolute', left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #7c3aed, transparent)' }}
+                    />
                   </div>
-                  {/* Processing indicator */}
-                  {processing && (
-                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(124,58,237,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <div className="spinner" style={{ width: 40, height: 40 }} />
-                    </div>
-                  )}
                 </div>
-
-                <p style={{ fontSize: '0.75rem', color: '#64748b', textAlign: 'center', margin: '0.5rem 0 0.75rem' }}>
-                  Point camera at a student's QR pass
-                </p>
-
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button onClick={flipCamera} style={{ flex: 1, padding: '0.55rem', borderRadius: '0.6rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
-                    <RotateCcw size={14} /> Flip Camera
-                  </button>
-                  <button onClick={stopCamera} style={{ flex: 1, padding: '0.55rem', borderRadius: '0.6rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171', cursor: 'pointer', fontSize: '0.8rem' }}>
-                    Stop Scanner
-                  </button>
-                </div>
+                {/* Processing indicator */}
+                {processing && (
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(124,58,237,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="spinner" style={{ width: 40, height: 40 }} />
+                  </div>
+                )}
               </div>
-            )}
+
+              <p style={{ fontSize: '0.75rem', color: '#64748b', textAlign: 'center', margin: '0.5rem 0 0.75rem' }}>
+                Point camera at a student's QR pass
+              </p>
+
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button onClick={flipCamera} style={{ flex: 1, padding: '0.55rem', borderRadius: '0.6rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                  <RotateCcw size={14} /> Flip Camera
+                </button>
+                <button onClick={stopCamera} style={{ flex: 1, padding: '0.55rem', borderRadius: '0.6rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171', cursor: 'pointer', fontSize: '0.8rem' }}>
+                  Stop Scanner
+                </button>
+              </div>
+            </div>
 
             {/* Scan result feedback */}
             <AnimatePresence>

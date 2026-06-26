@@ -4,6 +4,7 @@ import Certificate from '../models/Certificate.js';
 export const getMyCertificates = async (req, res) => {
   try {
     const certs = await Certificate.find({ user: req.user._id, isRevoked: false })
+      .populate('user', 'name email')
       .populate('event', 'title category startDate endDate banner organizer')
       .sort('-issuedAt');
     res.json({ success: true, certificates: certs });

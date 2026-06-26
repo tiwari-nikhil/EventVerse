@@ -11,6 +11,7 @@ import OnboardingPage from './pages/auth/OnboardingPage';
 import EventsPage from './pages/events/EventsPage';
 import EventDetailPage from './pages/events/EventDetailPage';
 import QRPassPage from './pages/events/QRPassPage';
+import VerifyCertificatePage from './pages/events/VerifyCertificatePage';
 
 // Student
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -69,6 +70,7 @@ function App() {
         <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/events/:id" element={<EventDetailPage />} />
+        <Route path="/verify/:code" element={<VerifyCertificatePage />} />
 
         {/* QR pass - student */}
         <Route path="/registrations/:id/qr" element={<ProtectedRoute><QRPassPage /></ProtectedRoute>} />
