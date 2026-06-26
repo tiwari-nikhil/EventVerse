@@ -1,7 +1,16 @@
 import axios from 'axios';
 
+// Normalize the API URL — always ensure it ends with /api
+// This prevents 404s if VITE_API_URL is set without the /api suffix
+const getRawUrl = () => {
+  const url = import.meta.env.VITE_API_URL;
+  if (!url) return '/api'; // local dev fallback (uses vite proxy)
+  const trimmed = url.replace(/\/$/, ''); // strip trailing slash
+  return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: getRawUrl(),
   headers: { 'Content-Type': 'application/json' },
 });
 

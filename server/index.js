@@ -21,9 +21,24 @@ const app = express();
 
 // Middleware
 app.use(helmet());
+const allowedOrigins = [
+  'https://event-verse-red.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:4173',
+];
+
 app.use(cors({
-  origin: "https://event-verse-red.vercel.app/" || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS blocked: ${origin}`));
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
