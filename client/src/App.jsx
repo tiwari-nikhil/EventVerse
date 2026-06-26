@@ -23,6 +23,7 @@ import CreateEventPage from './pages/organizer/CreateEventPage';
 import EditEventPage from './pages/organizer/EditEventPage';
 import AttendanceScannerPage from './pages/organizer/AttendanceScannerPage';
 import EventAnalyticsPage from './pages/organizer/EventAnalyticsPage';
+import EventParticipantsPage from './pages/organizer/EventParticipantsPage';
 import OrganizerRequestPage from './pages/organizer/OrganizerRequestPage';
 
 // Admin
@@ -86,6 +87,7 @@ function App() {
           <Route path="events/:id/edit" element={<EditEventPage />} />
           <Route path="events/:id/scan" element={<AttendanceScannerPage />} />
           <Route path="events/:id/analytics" element={<EventAnalyticsPage />} />
+          <Route path="events/:id/participants" element={<EventParticipantsPage />} />
         </Route>
 
         {/* Organizer request (for students wanting to become organizer) */}

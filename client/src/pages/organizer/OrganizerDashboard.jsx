@@ -141,6 +141,9 @@ export default function OrganizerDashboard() {
                         <QrCode size={13} /> Scan
                       </Link>
                     )}
+                    <Link to={`/organizer/events/${event._id}/participants`} style={{ padding: '0.4rem 0.75rem', borderRadius: '0.4rem', fontSize: '0.75rem', background: 'rgba(34,197,94,0.12)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.25)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }} title="View Participants">
+                      <Users size={13} /> Participants
+                    </Link>
                     <Link to={`/organizer/events/${event._id}/analytics`} style={{ padding: '0.4rem 0.75rem', borderRadius: '0.4rem', fontSize: '0.75rem', background: 'rgba(124,58,237,0.15)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.3)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
                       <BarChart2 size={13} /> Stats
                     </Link>
