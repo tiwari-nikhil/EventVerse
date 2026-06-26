@@ -368,3 +368,29 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ═══════════════════════════════════════════════════════
+   DASHBOARD LAYOUT — responsive sidebar
+   Desktop (≥768px): show the static flex sidebar,
+                     hide the mobile drawer & hamburger.
+   Mobile  (<768px): hide the static sidebar,
+                     show the fixed drawer & hamburger.
+═══════════════════════════════════════════════════════ */
+
+/* -- Desktop (768px and above) -- */
+@media (min-width: 768px) {
+  .desktop-sidebar  { display: flex !important; }
+  .mobile-sidebar   { display: none !important; }
+  .mobile-backdrop  { display: none !important; }
+  .mobile-menu-btn  { display: none !important; }
+  .mobile-logo      { display: none !important; }
+}
+
+/* -- Mobile (below 768px) -- */
+@media (max-width: 767px) {
+  .desktop-sidebar  { display: none !important; }
+  .mobile-sidebar   { display: flex !important; flex-direction: column; }
+  .mobile-menu-btn  { display: flex !important; }
+  .mobile-logo      { display: flex !important; }
+  .main-content     { padding: 1rem !important; }
+}

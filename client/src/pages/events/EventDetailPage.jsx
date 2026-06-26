@@ -81,7 +81,7 @@ export default function EventDetailPage() {
       </nav>
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 5%' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem', alignItems: 'start' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-8 items-start">
           {/* Left */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             {/* Banner */}

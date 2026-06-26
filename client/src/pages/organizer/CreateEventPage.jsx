@@ -76,7 +76,7 @@ export default function CreateEventPage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '2rem' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
         {/* Left - main form */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Basic info */}
@@ -94,7 +94,7 @@ export default function CreateEventPage() {
                 <textarea className="input-field" rows={5} placeholder="Describe your event in detail..." value={form.description} onChange={(e) => set('description', e.target.value)} style={{ resize: 'vertical', fontFamily: 'inherit' }} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="form-label">Category *</label>
                   <select className="input-field" value={form.category} onChange={(e) => set('category', e.target.value)}>
@@ -121,7 +121,7 @@ export default function CreateEventPage() {
           <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '1rem', padding: '1.5rem' }}>
             <h2 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '1.25rem' }}>Date & Location</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="form-label">Start Date & Time *</label>
                   <input type="datetime-local" className="input-field" value={form.startDate} onChange={(e) => set('startDate', e.target.value)} style={{ colorScheme: 'dark' }} />

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, SlidersHorizontal, X } from 'lucide-react';
+import { Search, X, LayoutDashboard } from 'lucide-react';
 import api from '../../api/axios';
 import EventCard from '../../components/EventCard';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import useAuthStore from '../../store/authStore';
 
 const categories = ['all', 'hackathon', 'workshop', 'seminar', 'webinar', 'competition', 'cultural', 'sports', 'volunteer', 'networking'];
 const modes = ['all', 'online', 'offline', 'hybrid'];
@@ -13,6 +14,8 @@ const sorts = [
 ];
 
 export default function EventsPage() {
+  const { user } = useAuthStore();
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
@@ -22,6 +25,13 @@ export default function EventsPage() {
   const [category, setCategory] = useState('all');
   const [mode, setMode] = useState('all');
   const [sort, setSort] = useState('-createdAt');
+
+  // Redirect to the correct dashboard based on role
+  const dashboardPath = user?.activeRole === 'organizer'
+    ? '/organizer/dashboard'
+    : user?.activeRole === 'admin'
+      ? '/admin/dashboard'
+      : '/student/dashboard';
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -47,13 +57,49 @@ export default function EventsPage() {
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: 'white', fontSize: 16 }}>E</div>
+              <img src="/logo.png" alt="EventVerse Logo" style={{ width: 28, height: 28, objectFit: 'contain' }} />
               <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, color: '#e2e8f0', fontSize: '1.1rem' }}>EventVerse</span>
             </Link>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Link to="/login" className="btn-secondary" style={{ fontSize: '0.85rem', padding: '0.45rem 1rem' }}>Sign In</Link>
-            <Link to="/register" className="btn-primary" style={{ fontSize: '0.85rem', padding: '0.45rem 1rem' }}>Join Free</Link>
+            {user ? (
+              /* ── Logged-in state ── */
+              <>
+                <Link
+                  to={dashboardPath}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 7,
+                    textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600,
+                    color: '#c4b5fd',
+                    background: 'rgba(124,58,237,0.12)',
+                    border: '1px solid rgba(124,58,237,0.3)',
+                    borderRadius: '0.5rem', padding: '0.45rem 0.9rem',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <LayoutDashboard size={15} />
+                  Dashboard
+                </Link>
+                <div style={{
+                  width: 34, height: 34, borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #7c3aed, #06b6d4)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 700, color: 'white', fontSize: 13,
+                  cursor: 'pointer', flexShrink: 0,
+                }}
+                  title={user.name}
+                  onClick={() => navigate(dashboardPath)}
+                >
+                  {user.name?.[0]?.toUpperCase() || 'U'}
+                </div>
+              </>
+            ) : (
+              /* ── Guest state ── */
+              <>
+                <Link to="/login" className="btn-secondary" style={{ fontSize: '0.85rem', padding: '0.45rem 1rem' }}>Sign In</Link>
+                <Link to="/register" className="btn-primary" style={{ fontSize: '0.85rem', padding: '0.45rem 1rem' }}>Join Free</Link>
+              </>
+            )}
           </div>
         </div>
       </div>

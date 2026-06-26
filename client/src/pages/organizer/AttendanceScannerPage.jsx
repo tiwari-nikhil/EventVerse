@@ -89,7 +89,7 @@ export default function AttendanceScannerPage() {
         {event && <p style={{ color: '#64748b', fontSize: '0.875rem' }}>{event.title}</p>}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Scanner */}
         <div>
           <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '1rem', padding: '1.5rem', marginBottom: '1.25rem' }}>

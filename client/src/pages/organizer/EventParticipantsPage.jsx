@@ -209,7 +209,9 @@ export default function EventParticipantsPage() {
 
       {/* Participants list */}
       <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '1rem', overflow: 'hidden' }}>
-        {/* Table header */}
+        <div className="overflow-x-auto w-full">
+          <div style={{ minWidth: 800 }}>
+            {/* Table header */}
         <div style={{
           display: 'grid', gridTemplateColumns: '2fr 1.5fr 1.2fr 1fr 1fr',
           padding: '0.75rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)',
@@ -314,6 +316,8 @@ export default function EventParticipantsPage() {
             })}
           </AnimatePresence>
         )}
+          </div>
+        </div>
       </div>
 
       {/* Footer count */}

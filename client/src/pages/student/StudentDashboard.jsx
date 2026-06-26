@@ -89,7 +89,7 @@ export default function StudentDashboard() {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '2rem' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
         {/* Recommended events */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>

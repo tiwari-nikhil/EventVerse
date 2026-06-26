@@ -59,7 +59,7 @@ export default function EditEventPage() {
           <label className="form-label">Description</label>
           <textarea className="input-field" rows={6} value={form.description} onChange={(e) => set('description', e.target.value)} style={{ resize: 'vertical', fontFamily: 'inherit' }} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="form-label">Start Date</label>
             <input type="datetime-local" className="input-field" value={form.startDate} onChange={(e) => set('startDate', e.target.value)} style={{ colorScheme: 'dark' }} />

@@ -40,7 +40,7 @@ export default function LoginPage() {
         className="md:flex"
       >
         <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: 'white' }}>E</div>
+          <img src="/logo.png" alt="EventVerse Logo" style={{ width: 34, height: 34, objectFit: 'contain' }} />
           <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.2rem', fontWeight: 800, color: '#e2e8f0' }}>EventVerse</span>
         </Link>
 
@@ -120,31 +120,6 @@ export default function LoginPage() {
           <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#64748b' }}>
             Don't have an account?{' '}
             <Link to="/register" style={{ color: '#a78bfa', textDecoration: 'none', fontWeight: 600 }}>Create one free</Link>
-          </div>
-
-          {/* Demo accounts */}
-          <div style={{ marginTop: '1.5rem', padding: '1rem', borderRadius: '0.75rem', background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)' }}>
-            <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: 8, fontWeight: 600 }}>Demo Accounts</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {[
-                { label: 'Student', email: 'student@demo.com', pass: 'demo123' },
-                { label: 'Organizer', email: 'organizer@demo.com', pass: 'demo123' },
-                { label: 'Admin', email: 'admin@demo.com', pass: 'demo123' },
-              ].map(({ label, email, pass }) => (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => setForm({ email, password: pass })}
-                  style={{
-                    background: 'none', border: 'none', cursor: 'pointer',
-                    textAlign: 'left', fontSize: '0.75rem', color: '#7c3aed',
-                    padding: '0.2rem 0', fontWeight: 500,
-                  }}
-                >
-                  → Use {label} demo
-                </button>
-              ))}
-            </div>
           </div>
         </motion.div>
       </div>

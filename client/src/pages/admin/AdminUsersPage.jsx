@@ -61,7 +61,9 @@ export default function AdminUsersPage() {
         <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><div className="spinner" /></div>
       ) : (
         <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '1rem', overflow: 'hidden' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 200px 120px 100px', padding: '0.75rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.07)', fontSize: '0.75rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <div className="overflow-x-auto w-full">
+            <div style={{ minWidth: 800 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 200px 120px 100px', padding: '0.75rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.07)', fontSize: '0.75rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             <span>User</span><span>Email</span><span>Roles</span><span>Joined</span><span>Status</span>
           </div>
           {users.map((user, i) => (
@@ -89,6 +91,8 @@ export default function AdminUsersPage() {
               </button>
             </motion.div>
           ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

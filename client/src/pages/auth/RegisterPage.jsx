@@ -34,7 +34,7 @@ export default function RegisterPage() {
       {/* Left */}
       <div className="hidden md:flex" style={{ flex: 1, padding: '3rem', background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)', flexDirection: 'column', justifyContent: 'space-between', borderRight: '1px solid rgba(255,255,255,0.07)' }}>
         <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: 'white' }}>E</div>
+          <img src="/logo.png" alt="EventVerse Logo" style={{ width: 34, height: 34, objectFit: 'contain' }} />
           <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.2rem', fontWeight: 800, color: '#e2e8f0' }}>EventVerse</span>
         </Link>
         <div>
@@ -62,7 +62,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Role selector */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.5rem' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
             {roles.map(({ value, label, desc }) => (
               <button key={value} type="button" onClick={() => setForm({ ...form, role: value })}
                 style={{
@@ -117,7 +117,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="form-label">Department</label>
                 <input className="input-field" placeholder="e.g. CS, ECE" value={form.department}

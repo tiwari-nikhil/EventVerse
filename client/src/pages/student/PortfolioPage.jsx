@@ -108,7 +108,7 @@ export default function PortfolioPage() {
       </motion.div>
 
       {/* Profile card */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1rem', marginBottom: '2.5rem' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
         {[
           { label: 'Events Attended', value: attended, icon: '🎯' },
           { label: 'Certificates', value: certificates.length, icon: '🏆' },

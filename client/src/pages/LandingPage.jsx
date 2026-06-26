@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Zap, Award, QrCode, BarChart2, Users, Star,
-  ArrowRight, CheckCircle, Globe, Shield, ChevronRight
+  ArrowRight, CheckCircle, Globe, Shield, ChevronRight, LayoutDashboard
 } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 
@@ -72,13 +72,8 @@ export default function LandingPage() {
         backdropFilter: 'blur(16px)',
         borderBottom: '1px solid rgba(255,255,255,0.06)',
       }}>
-        <div className="flex items-center gap-3">
-          <div style={{
-            width: 36, height: 36, borderRadius: 10,
-            background: 'linear-gradient(135deg, #7c3aed, #06b6d4)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 18, fontWeight: 800, color: 'white',
-          }}>E</div>
+        <div className="flex items-center gap-2">
+          <img src="/logo.png" alt="EventVerse Logo" style={{ width: 34, height: 34, objectFit: 'contain' }} />
           <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.25rem', fontWeight: 800, color: '#e2e8f0' }}>
             Event<span className="gradient-text">Verse</span>
           </span>
@@ -135,8 +130,12 @@ export default function LandingPage() {
             </p>
 
             <div className="flex items-center justify-center gap-4" style={{ flexWrap: 'wrap' }}>
-              <button onClick={handleGetStarted} className="btn-primary" style={{ fontSize: '1rem', padding: '0.85rem 2rem', gap: '0.6rem' }}>
-                Get Started Free <ArrowRight size={18} />
+              <button onClick={handleGetStarted} className="btn-primary" style={{ fontSize: '1rem', padding: '0.85rem 2rem', gap: '0.6rem', display: 'flex', alignItems: 'center' }}>
+                {token ? (
+                  <><LayoutDashboard size={18} /> Go to Dashboard</>
+                ) : (
+                  <>Get Started Free <ArrowRight size={18} /></>
+                )}
               </button>
               <Link to="/events" className="btn-secondary" style={{ fontSize: '1rem', padding: '0.85rem 2rem' }}>
                 Browse Events
@@ -155,9 +154,8 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mt-16"
             style={{
-              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: '1rem', marginTop: '4rem',
               background: 'rgba(255,255,255,0.03)',
               border: '1px solid rgba(255,255,255,0.08)',
               borderRadius: '1.25rem', padding: '1.5rem 2rem',
@@ -279,8 +277,12 @@ export default function LandingPage() {
           <p style={{ color: '#64748b', marginBottom: '2rem', fontSize: '1rem' }}>
             Join thousands of students transforming event participation into career-ready achievements.
           </p>
-          <button onClick={handleGetStarted} className="btn-primary" style={{ fontSize: '1rem', padding: '0.9rem 2.5rem' }}>
-            Start Your Journey <ArrowRight size={18} />
+          <button onClick={handleGetStarted} className="btn-primary" style={{ fontSize: '1rem', padding: '0.9rem 2.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            {token ? (
+              <><LayoutDashboard size={18} /> Go to Dashboard</>
+            ) : (
+              <>Start Your Journey <ArrowRight size={18} /></>
+            )}
           </button>
         </div>
       </section>
@@ -288,7 +290,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: '2rem 5%', textAlign: 'center', color: '#475569', fontSize: '0.82rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
-          <div style={{ width: 24, height: 24, borderRadius: 6, background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: 'white' }}>E</div>
+          <img src="/logo.png" alt="EventVerse Logo" style={{ width: 22, height: 22, objectFit: 'contain' }} />
           <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: '#94a3b8' }}>EventVerse</span>
         </div>
         <p>© 2025 EventVerse. Transforming Event Participation into Student Growth.</p>
