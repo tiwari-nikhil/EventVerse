@@ -35,15 +35,6 @@ npm run dev
 
 ---
 
-## 🔑 Demo Accounts
-
-| Role | Email | Password |
-|---|---|---|
-| 🎓 Student | student@demo.com | demo123 |
-| 🎪 Organizer | organizer@demo.com | demo123 |
-| ⚡ Admin | admin@demo.com | demo123 |
-
----
 
 ## 🏗️ Architecture
 
